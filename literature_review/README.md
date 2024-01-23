@@ -1,5 +1,4 @@
-### Literature Review 
-### 🚨 THIS SOLUTION IS BEING CARRIED OUT IN ANOTHER BRANCH AND WILL BE ADDED ON THURSDAY; SEE SLACK MESSAGE FOR MORE DETAILS.
+### Review of Private Information Retrieval (also known as Homomorphic Encryption) as a possible Story Protocol's Hook for privacy, security, and compliance
 
 <br>
 
