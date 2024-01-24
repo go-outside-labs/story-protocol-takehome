@@ -996,6 +996,11 @@ In another design, the **Registration Module** could support private functions f
 
 Most PIR protocols, however, do not ensure data integrity or authentication (although, a natural way to construct an authenticated-PIR scheme is to combine a standard unauthenticated multi-server PIR scheme with a standard integrity-protection mechanism, such as Merkle trees).
 
+PIR servers download the blockchain, constructs PIR databases. For each database, the PIR server creates a description file called manifest file.
+(b) The user collect all available block headers from e.g., full node peers.
+(c) The user fetch the manifest files from the PIR servers to later efficiently query the PIR database.
+(d) The user executes the PIR-SPV protocol, decodes the PIR responses for servers and then performs SPV validation
+
 In this sense, a zero-knowledge protocol, which generally can verify the truth of information without revealing the information itself, come to the forefront as one of three possible solutions to ensure the privacy of the information exchanged on the blockchain. The other ones are secure multi-party computations (sMPC) and trusted execution environments (TEE). All three of these methods ensure the privacy of information exchanged on the blockchain. Each of these methods possesses different use cases, limitations, and technical specifications
 
 
