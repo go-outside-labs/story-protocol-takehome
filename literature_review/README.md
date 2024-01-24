@@ -3,28 +3,21 @@
 <br>
 
 
-This document reviews recent advances in **Private Information Retrieval** (a type of **Homomorphic Encryption**) in the context of **Story Protocol's privacy-enhanced hooks and modules**, briefly discussing general **applications of zero-knowledge proof setups**.
+This document reviews recent advances in **Private Information Retrieval** (a type of **Homomorphic Encryption**) in the context of **Story Protocol's privacy-enhanced hooks and modules**, while briefly discussing general **applications of zero-knowledge proof setups**.
 
 <br>
 
-This is the route we are following:
+We divide this work into the following sections:
 
 * **I. Theoretical Background**: 
-    - We briefly introduce what's the PIR protocol and its potential applications, together with key concepts such as Homomorphic Encryption and Learning with Errors (LWE)
-
+    - We briefly introduce what a PIR protocol is, potential applications, and key concepts such as Homomorphic Encryption and Learning with Errors (LWE). This brief overview is a summary from several sources, cited in the end of the document.
 <br>
 
 * **II. Main Paper**: 
-    - We review [ "One Server for the Price of Two: Simple and Fast Single-Server Private Information Retrieval", by Alexandra Henzinger et al. (2022)](https://eprint.iacr.org/2022/949), through a software engineer point of view, *i.e.* exemplifying the ideas with a coding setup (and approachable language)
-
+    - We utilize a creative approach to review the strategy described at [ "One Server for the Price of Two: Simple and Fast Single-Server Private Information Retrieval", by Alexandra Henzinger et al. (2022)](https://eprint.iacr.org/2022/949) explaining the concepts by a coding setup suitable to any softare engineer.
 <br>
 
-* **III. Supporting Papers**: 
-    - We summarize several recent PIR papers, highlighting additional context about PIR and possible future breakthroughs.
-
-<br>
-
-* **IV. High-Level Discussion in the Context of Story Protocol**:
+* **III. Discussion in the Context of Story Protocol**:
     - We conclude with some of the current gaps in PIR technology and a high-level discussion on the design of cryptographic primitives (including zero-knowledge proofs) within the Story Protocol.
 
 
@@ -44,7 +37,7 @@ Private information retrieval refers to the **ability to query a database withou
 
 PIR schemes are generally divided into **single-server schemes** and **multiple-server schemes** (which allows you to remove the trust from a subset of the servers). 
 
-In a very simple single-server PIR protocol setup, a server holds an embedded database `D` represented by a `n x n` square matrix (whose elements are under a constant modulo), and a client wants to privately read the `ith` database item (`Di`, with `n` elements) without letting the server learn about `i`.
+In a simple single-server PIR protocol setup, a server holds an embedded database `D` represented by a `n x n` square matrix (whose elements are under a constant modulo), and a client wants to privately read the `ith` database item (`Di`, with `n` elements) without letting the server learn about `i`.
 
 <br>
 
@@ -55,9 +48,6 @@ In a very simple single-server PIR protocol setup, a server holds an embedded da
 <br>
 
 
-
-
-This simplification will be helpful in the next section, when we discuss the main paper.
 
 
 <br>
@@ -86,12 +76,54 @@ Homomorphism is the property that if a client sends two encrypted messages, `c1`
 
 PIR is also a subset of the broad topic of **lattice-based cryptography**, which refers to a series of **quantum-resistant cryptographic primitives** involving lattices, either in their construction or in the security proof.
 
-In a [seminal PIR paper in 2005](https://dl.acm.org/doi/10.1145/1060590.1060603), Oded Regev introduced the **first lattice-based public-key encryption scheme** and the **learning with errors (LWE) problem**. 
+Over an n-dimensional vector space, a lattice is an infinite set of points represented by a collection of vectors. T
+
+In a [seminal PIR paper in 2005](https://dl.acm.org/doi/10.1145/1060590.1060603), Oded Regev introduced the **first lattice-based public-key encryption scheme** and the **learning with errors (LWE) problem**.
+
+The Regev encryption is additively homomorphic, since given two ciphertexts `(a1, 𝑐1)` and `(a2, 𝑐2)`, their sum `(a1 +a2, 𝑐1 +𝑐2)` decrypts to the sum of the plaintexts, provided that the error remains sufficiently small.
 
 The LWE problem can be thought of as **a search in a (noisy) modular set of equations whose solutions can be very difficult to solve**. In other words, given `m` samples of coefficients `(bi, ai)` in the linear equation `bi = <ai, s> + ei`, with the error `ei` sampled from a small range `[-bound, bound]`, finding the secret key `s` is "hard". 
 
 In the past decades, Regev's security proof and the LWE scheme's efficiency have been the subject of intense research among cryptographers, including [Craig Gentry's thesis (2009)](https://crypto.stanford.edu/craig/craig-thesis.pdf), on the **first Fully Homomorphic Encryption Scheme**.
 
+To build encryption using LWE, we rely on the hardness of distinguishing
+between a message with added noise and a random sample.
+R)LWE-based encryption schemes have a significant drawback due to noise
+growth. As previously mentioned, the ciphertexts produced by these schemes
+are noisy encodings of the plaintext, and homomorphic operations between
+ciphertexts increase the magnitude of the noise. If the noise exceeds a certain threshold, the correctness of the decryption may no longer hold.
+
+The three PIR schemes comprise two phases: the offline phase, which includes pre-computations and the exchange of hints, and the online phase,
+which involves query processing on the server and response decoding on
+the client
+
+We have seen in Section 3.1 that the query is the encryption of the unitvector uj consisting of all zeros except at index j, selecting for the column
+where the record lies in the database.
+
+In the online phase of Simple, we observed that the matrix multiplication
+between the database D and the matrix A does not depend on the client’s
+query. Hence, this matrix multiplication can be moved to the offline phase to
+improve performance. We refer to hintc = D ⇥ A as the hint matrix, which
+the client downloads at the start of the protocol before making any queries.
+
+We observe in Table 4.3 the query size after encryption grows with
+the number of field elements that represent the database. Table 4.2
+compares the asymptotic cost for query generation against other protocol stages.
+
+The theoretical query size grows as the square root of the number
+of field elements that represent the database. This is consistent with
+the experimental results shown in Figure 5.3. We consider the results
+reasonable. For example, the largest query size for Simple is 682 KB
+when the total database size is 32 GB.
+
+In conclusion, our findings indicate that the practicality of PIR-based applications is primarily impacted by the query processing time and the hint
+exchange phase. Our experimental results and case studies demonstrate
+that for small record sizes less than 1 KB, Simple, Double, and Spiral perform
+well, even with large numbers of records, e.g., billions of 1-bit entries as
+in the SCT auditing for the Certificate Transparency application [1]. However, as record size increases, we observe that both Simple and Double scale
+better than Spiral, but still has significant query processing times. These
+results emphasize the need for further optimizations and advancements in
+PIR schemes to handle queries efficiently in a database with large records.
 
 
 <br>
@@ -120,7 +152,9 @@ Once PIR becomes less expensive or prohibitive (*i.e.*, cheaper computation with
 
 #### Key Tenets
 
-* This paper introduces a design for **SimplePIR**, **the fastest single-server PIR scheme known to date**, where the security holds under the **learning-with-errors (LWE) assumption** for the problem of **safe browsing**.
+* This paper introduces a design for **SimplePIR**, **the fastest single-server PIR scheme known to date**.
+
+* The security holds under a simple **learning-with-errors (LWE) scheme** that requires no polynomial arithmetic or fast Fourier transforms. The Secret-key Regev encryption gives a secret-key encryption scheme that is secure under the LWE assumption.
 
 * To answer a client’s query, the server performs fewer than **one 32-bit multiplication** and **one 32-bit addition** per **database byte**, achieving **10 GB/s/core server throughput**.
 
@@ -129,6 +163,20 @@ Once PIR becomes less expensive or prohibitive (*i.e.*, cheaper computation with
 * The second approach **shrinks the hint to 16 MB**. Then, following queries demands **345 KB of communication**.
 
 * Finally, the scheme is applied, together with a novel data structure for approximate set membership, to the task of **private auditing in Certificate Transparency**. The results can be compared to Google Chrome’s current approach, with **16 MB of download per month, along with 150 bytes per TLS connection**.
+
+The goal of the PIR problem is to design schemes that
+satisfy the privacy and correctness constraints while achieving
+the minimum possible download cost, equivalently, the largest
+possible PIR rate. The download cost of a PIR scheme is
+defined as the total number of bits downloaded by the user
+from all the databases, normalized by the message size. The
+PIR rate is defined as the reciprocal of the PIR download
+cost. The system model for PIR is shown in Fig 2, where a
+user wants to download the message
+Wθ, without revealing
+the message index
+θ to any of the databases.
+
 
 <br>
 
@@ -874,17 +922,6 @@ def secret_key_regev_example():
 
 <br>
 
----
-
-
-### III. Supporting Papers
-
-
-
-
-
-
-<br>
 
 ---
 
@@ -892,20 +929,45 @@ def secret_key_regev_example():
 
 <br>
 
+#### Why PIR is Still Not Feasible
+
+Currently, the PIR protocol works well enough at smaller scales, but as the database grows, the time required to scan it grows at least proportionally. For bigger databases, the process becomes prohibitively inefficient.
+
+One of the possible approaches is to choose a polynomial carefully enough, and then have a single server that preprocesses. The server’s preprocessing depends only on the
+database `D` and the public parameters of the Regev encryption scheme, so the server can reuse this preprocessing work across many queries from many independent clients.
+
+After this preprocessing step, to answer a client’s query, the server needs to compute only roughly `𝑁 32-bit` integer multiplications and additions on a database of `𝑁 bytes`. The catch is that the client must download a “hint” about the database contents after this preprocessing.
+
+Althoigh modern PIR schemes require surprisingly little communication (with a single database server and under modest cryptographic assumptions the total communication required to fetch a database record grows only polylogarithmically with the number of records,`N`. 
+
+After preprocess the database, the server can answer a query in time sublinear
+in `N`, but all known approaches require either client-specific
+preprocessing or impractically large server storage. Thus, a hard limit on the throughput of PIR schemes—that is, the ratio between the database size and the server time to answer a query—is the speed with which the PIR server can read the database from memory: roughly 12.4 GB/s/core on our machine.
+
+
+
+
+This underscores the challenges faced by prior PIR protocols, as they either
+suffer from poor performance in a single-server setting or require unrealistic trust assumptions of non-colluding servers. However, the situation has
+changed dramatically with the introduction of the offline-online PIRs. During
+the offline phase, some information about the database is precomputed and
+exchanged to optimize the server’s processing time during the online phase.
+This information, known as the ”hint”, allows the client to make unlimited
+
+<br>
 
 #### PIR for Private IP Search
 
-In the following years, when PIR protocols become fully available for commercial applications, Story Protocol could take advantage of this technology to implement private oracles, including private IP search and discovery.
+If PIR protocols become fully available for commercial applications, Story Protocol could take advantage of this technology to implement private oracles, including private IP search and discovery.
 
 Although it's still early to define how this protocol could be incorporated to Story's modular architecture, we summarize some ideas below.
 
-<br>
+The database is stored in plaintext on the server and they all
+use lattice-based encryption schemes as building blocks. Simple and Double
+use Regev encryption under the Learning With Errors (LWE) assumption,
+where each record is represented as a sequence of elements in some finite
+field. 
 
-<p align="center">
-<img src="diagrams/pir2.png" width="90%" align="center"/>
-
-<br>
-<br>
 
 [Story Protocol's documentation](https://docs.storyprotocol.xyz/docs/) define the **Function Layer (verbs)** separated from the **Data Layer (nouns)** and divided into two types of components:
 - **Modules**, defining the actions that users can perform on the IP assets (IPAs), *i.e.* the management of the data. 
@@ -920,18 +982,94 @@ In this design, PIR could be introduced as the follow:
 
 In another design, the **Registration Module** could support private functions for searching for IP assets (and their metadata).
 
+<br>
+
+<p align="center">
+<img src="diagrams/pir2.png" width="90%" align="center"/>
 
 <br>
+<br>
+
+
 
 #### Zero Knowledge Proofs for other Privacy-Enhanced Operations
 
-In the Story Protocol documentation, there is a hint on the applicability of ZKPs and cryptographic setups when [speaking of AI-generated Assets market places](https://docs.storyprotocol.xyz/docs/ai-generated-assets-marketplace):
+Most PIR protocols, however, do not ensure data integrity or authentication (although, a natural way to construct an authenticated-PIR scheme is to combine a standard unauthenticated multi-server PIR scheme with a standard integrity-protection mechanism, such as Merkle trees).
+
+In this sense, a zero-knowledge protocol, which generally can verify the truth of information without revealing the information itself, come to the forefront as one of three possible solutions to ensure the privacy of the information exchanged on the blockchain. The other ones are secure multi-party computations (sMPC) and trusted execution environments (TEE). All three of these methods ensure the privacy of information exchanged on the blockchain. Each of these methods possesses different use cases, limitations, and technical specifications
+
+
+The goal of zero-knowledge proofs is for a verifier to be able to convince herself that a prover possesses knowledge of a secret parameter, called a witness, satisfying some relation, without revealing the witness to the verifier or anyone else.
+
+
+In the Story Protocol documentation, there is a hint on the applicability of ZKPs and cryptographic setups when [speaking of AI-generated Assets market places](https://docs.storyprotocol.xyz/docs/ai-generated-assets-marketplace).
 
 > "Use ZKP or simple hash of prompt to validate that the marketplace is running infringement checks without revealing prompts".
+
+ Machine Learning: ZKPs can allow the owner of a machine learning algorithm to convince others about the results of the model without revealing any information about the ML model itsel
+ZKPs can allow the owner of a machine learning algorithm to convince others about the results of the model without revealing any information about the ML model itsel
+
+
+The ZK-SNARK protocol has the following qualities:
+
+Zero-Knowledge(ZK): means that the verifier has no information other than the validity claim given by the prover.
+Succinct: simply means that the proof size is small thus making verification easy and quick.
+Non-interactive: little or no interaction is required between the prover and the verifier.
+Argument of Knowledge: in simple terms refers to a malicious actor not being able to cheat the system without providing the knowledge to support their claim.
+
+The ZK-STARK protocol has the following features:
+
+Zero-knowledge(ZK): means that the verifier has no information other than the validity claim given by the prover.
+Scalable: With this tech, computing transaction execution and storing data can be done off-chain, with a single STARK proof to verify their validity on-chain. Scalability of blockchain infrastructure is therefore made possible by its capacity to batch thousands of transactions for on-chain verification at a cheap gas cost.
+Transparent: uses publicly-available randomness to generate parameters, eliminating the need for a trusted setup.
+Argument of Knowledge: implies the same meaning as one stated above.
+
+
+ZK-SNARKs work based on the following:
+
+a. Set-up: A set-up to construct and determine the initial state of the prover and verifier. It uses a combination of public and private keys or a common reference string.
+b. Proving key: A private key that is used to generate a proof.
+c. Verifying key: A corresponding public key which is in turn used to verify the proof.
+
 
 However, the advantages of ZKP on privacy, integrity, and suncintness could virtually be used on almost every of the features of the protocol.
 
 At the Function layer, privacy protection hooks could be leveraged to protect IP rights and to allow content encryption, digest registration, private governance, private compliance, private payment, private token gating, duplicated IP detection, and PI protection.
 
 At the application layer (ecosystem), some examples are KYC verification for license issuers and holders and even a decentralized identity for IP holders.
+
+
+
+
+Computation Intensity: Executing a ZKP requires both a proving algorithm and a verifying algorithm, making it computationally intensive. This makes ZKPs unsuitable for slow or mobile devices. In particular, proving computation cost increases when cryptography (not ZK friendly) is applied to circuit computation.
+Design ZkEVM Challenge: zkEVM that is 100% compatible with native EVM is difficult to build.
+Security: In order to satisfy the three properties of ZKP (Completeness, Soundness, and Zero-knowledge), it is necessary to check that there are no security vulnerabilities in circuit configuration, library use, development, tools, and technologies.
+
+
+
+Challenges:
+
+* Inadequate Key Management (such as weak generated encryption keys, storing encryption keys in an insecure manner, or using the same key for multiple purposes).
+
+* Random Number Generation Issues and insufficient entropy
+
+* Algorithmic Flaws and Backdoors
+
+* Computation intensity: Algorithms used are computationally intense as they require many interactions between the verifier and the prover (in interactive ZKPs), or require a lot of computational capabilities (in non-interactive ZKPs). This makes ZKPs unsuitable for slow or mobile devices.
+
+
+
+<br>
+
+---
+
+### References
+
+
+* [Private Information Retrieval and Its Applications, Sajani Vithana et al.](https://arxiv.org/pdf/2304.14397.pdf)
+* [Practical Private Information Retrieval, Femi George Olumofin](https://uwspace.uwaterloo.ca/bitstream/handle/10012/6142/Olumofin_Femi.pdf?sequence=1&isAllowed=y)
+* [How Practical is Single-Server Private Information Retrieval?, Sophia Artioli](https://ethz.ch/content/dam/ethz/special-interest/infk/inst-infsec/appliedcrypto/education/theses/How_practical_is_single_server_private_information_retrieval_corrected.pdf)
+
+* [Applying Private Information Retrieval to Lightweight Bitcoin Clients, Kaihua Qin et al.](https://www.computer.org/csdl/proceedings-article/cvcbt/2019/366900a060/1cdOwKCMqXK)
+
 
