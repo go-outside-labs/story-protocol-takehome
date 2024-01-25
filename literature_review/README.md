@@ -109,7 +109,7 @@ One possible implementation approach is to choose a suitable polynomial and then
 
 After the preprocessing step, to answer a client's query, the server must compute only roughly `N 32-bit` integer multiplications and additions on a database of `N bytes`. The catch is that the client must download a *hint* matrix about the database contents after this preprocessing.
 
-Therefore, a simple serve PIR scheme would comprise two phases:
+Therefore, a simple server PIR scheme would comprise two phases:
 
 * **the offline phase**, with pre-computations and the exchange of *hints*, and
 
@@ -347,7 +347,7 @@ First, we represent a message vector `m0` of size `m`, where each element has a 
 
 Next, we encrypt this message with a simple `B = A * s + e + m0`, where `s` is the secret and `e` is an error vector.
 
-Then, we set the ciphertext as the tuple `c = (B, A)` and decrypt `c = (B, A)` for a given `s`, such that `m1 = m0 + e`.
+Then, we set the ciphertext as the tuple `c = (B, A)` and decrypt it for a given `s`, such that `m1 = m0 + e`.
 
 
 <br>
@@ -379,7 +379,7 @@ The original message should be retrieved.
 #### Part IV: Running a Simple Linear Key Regev Encryption Experiment with a Scaled Message
 
 
-Continuing with Learning with Errors (LWE), we now lose information on the least significant bits by adding noise, *i.e.*, by scaling the message vector (before adding it to encryption) with:
+Continuing with LWE, we now lose information on the least significant bits by adding noise, *i.e.*, by scaling the message vector (before adding it to encryption) with:
 
 ```
 delta = mod / p
@@ -430,7 +430,7 @@ def linear_secret_key_regev_encryption_scaled():
     # 4. Calculate the decryption of the ciphertext c
     m1 = regev.calculate_decryption(s, c)
 
-    # 5. Scale m1 vector by 1/ delta = p / mod
+    # 5. Scale m1 vector by 1 / delta = p / mod
     scaled_m1 = m1.calculate_scaling(regev.p, regev.mod, regev.p)
 
     # 6. The message vector m0 should be equal to m1
@@ -446,7 +446,7 @@ The original message should be retrieved.
 
 #### Part V: Proving that the Regev Scheme is Additive Homomorphic
 
-As we saw above, additive homomorphism means that if `c0` is the encryption of `m1` under a secret key `s`, and `c2` is the encryption of `m2` under the same secret key `s`, then `c0 + c1` is the encryption of `m0 + m1` under `s`.
+As we saw above, additive homomorphism means that if `c0` is the encryption of `m0` under a secret key `s`, and `c1` is the encryption of `m1` under the same secret key `s`, then `c0 + c1` is the encryption of `m0 + m1` under `s`.
 
 For a large number of `ci`, noise can be introduced from error, so the correctness of the results will depend on the values of `m`, `n`, `mod`, and `p`, such that:
 
@@ -499,9 +499,9 @@ The original message should be retrieved.
 
 #### Part VI: Proving that the Regev Scheme Supports Plaintext Inner Product
 
-This experiment shows that given a cipher `c` and a message vector `m0`, `c -> c1` can be transformed such that it also encrypts the inner product of `m0` with a plaintext vector `k` of size `m` and element modulo `p`.
+This experiment shows that given a cipher `c` and a message vector `m0`, we can perform a tranformation `c -> c1` such that it also encrypts the inner product of `m0` with a plaintext vector `k` of size `m` and element modulo `p`.
 
-Because of noise growth with the vector `k`, fine-tuning the initial parameters is crucial for the message to be successfully retrieved. As you will see in the snippet below, to guarantee correct decryption, the following must hold:
+Because of noise growth with the vector `k`, fine-tuning the initial parameters is crucial for the message to be successfully retrieved. To guarantee correct decryption, the following must hold:
 
 ```
 k * e0 < mod / (2 * p)
@@ -512,8 +512,6 @@ Here is the source code:
 <br>
 
 ```python
-
-
 def plaintext_inner_product():
 
     # 1. Key generation
@@ -668,9 +666,9 @@ The original message should be retrieved.
 #### Why PIR is Still Not Feasible
 
 
-Although modern PIR schemes require surprisingly little communication and the protocol works well enough at smaller scales, the time needed to scan it grows proportionally as the database grows. For bigger databases, the process becomes prohibitively inefficient (fetching a database record grows only polylogarithmically with the number of records, `N`).
+Although modern PIR schemes require **little communication** and the protocol **works well enough at smaller scales**, the time needed to scan a database **grows proportionally** with the size of its size and can become **prohibitively inefficient** (fetching a database record grows only polylogarithmically with the number of records, `N`).
 
-After preprocessing the database, the server can answer a query in time sublinear in `N`. Thus, the current hard limit on the throughput of PIR schemes is the ratio between the database size and the server time to answer a query (the speed with which the PIR server can read the database from memory).
+However, **after preprocessing the database**, the server can **answer a query in time sublinear in `N`**. Thus, the current hard limit on the throughput of PIR schemes is the ratio between the database size and the server time to answer a query.
 
 
 <br>
@@ -693,9 +691,9 @@ In this design, PIR could be introduced as follows:
 4. Application layers performing queries (client side).
 
 
-Finally, it's important to note that PIR protocols do not ensure data integrity or authentication. An authenticated PIR scheme could combine an unauthenticated multi-server PIR scheme with a standard integrity-protection mechanism, such as Merkle trees.
+Note that **PIR protocols do not ensure data integrity or authentication**.  An authenticated PIR scheme could **combine an unauthenticated multi-server PIR scheme with a standard integrity-protection mechanism**, such as Merkle trees. 
 
-In this approach, PIR servers download the data from the blockchain to construct PIR databases. For each database, the PIR server creates a description file (usually called a *manifest file*). The user collects all available block headers and fetches the manifest files from the PIR servers to query the PIR database later efficiently.
+In this approach, **PIR servers download the data from the blockchain to construct PIR databases**. For each database, the PIR server creates a description file (usually called a *manifest file*). The user collects all available **block headers** and fetches the manifest files from the PIR servers to query the PIR database later efficiently.
 
 
 <br>
@@ -716,33 +714,33 @@ In the Story Protocol documentation, there is a hint at the applicability of ZKP
 
 <br>
 
-Therefore, we conclude this work by briefly touching on further privacy enhancements through a zero-knowledge protocol, which is designed to verify the truth of information without revealing the information itself. In other words, a verifier can convince themselves that a prover possesses knowledge of a secret parameter (called a witness) satisfying some relation, without revealing the witness to the verifier or anyone else.
+Therefore, we conclude this work by briefly touching on further privacy enhancements through a zero-knowledge protocol, which is designed to **verify the truth of information without revealing the information itself**. In this case, a **verifier** convince themselves that a **prover** possesses knowledge of a secret parameter (called a **witness**) satisfying some relation, without revealing the witness to the verifier or anyone else.
 
 
 <br>
 
-> 💡 *ZKPs come to the forefront as one of three possible solutions to ensure the privacy of the information exchanged on the blockchain. The other ones are secure multi-party computations (sMPC) and trusted execution environments (TEE).*
+> 💡 *ZKPs come to the forefront as possible solutions to ensure the privacy of the information exchanged on the blockchain. Other ones are secure multi-party computations (sMPC) and trusted execution environments (TEE).*
 
 
 <br>
 
 For instance, the popular ZK-SNARK setup could generally be implemented by:
 
-* An off-chain key generator and ceremony, for enough entropy.
+* An off-chain key generator and ceremony, with enough entropy.
 * An on-chain setup to construct and determine the initial state of the prover and verifier (using a combination of public and private keys or a common reference string).
 * At the Function layer, privacy protection hooks could be leveraged to protect IP rights and to allow content encryption, digest registration, private governance, private compliance, private payment, private token gating, duplicated IP detection, and PII protection.
-At the application layer (ecosystem), some examples are KYC verification for license issuers and holders and even a decentralized identity for IP holders.
+* At the application layer (ecosystem), some examples are KYC verification for license issuers and holders or even a decentralized identity for IP holders.
 
 
 <br>
 
-The current downsides of this technology are:
+Finally, the current downsides of this technology are:
 
-* Computation intensity: algorithms used are computationally intense as they require many interactions between the verifier and the prover (in interactive ZKPs), or a lot of computational capabilities (in non-interactive ZKPs).
+* **computation intensity**: ZKP algorithms are computationally intense as they require many interactions between the verifier and the prover (in interactive ZKPs), or a lot of computational capabilities (in non-interactive ZKPs).
 
-* Design ZkEVM challenge: zkEVM that is fully compatible with native EVM is difficult to build.
+* **design challenge**: zkEVMs that are fully compatible with native EVM are difficult to build.
 
-* Security: to satisfy the three properties of ZKP (Completeness, Soundness, and Zero-knowledge), it is necessary to check that there are no security vulnerabilities in circuit configuration, library use, and key management (such as weak generated encryption keys, storing encryption keys in an insecure manner, or using the same key for multiple purposes).
+* **security**: to satisfy the three properties of ZKP (completeness, soundness, and zero-knowledge), it is necessary to check that there are no security vulnerabilities in circuit configuration, library use, and key management (such as weak generated encryption keys, storing encryption keys in an insecure manner, or using the same key for multiple purposes).
 
 
 <br>
