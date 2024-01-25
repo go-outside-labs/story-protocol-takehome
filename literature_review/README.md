@@ -146,13 +146,13 @@ Once PIR becomes less expensive or prohibitive (*i.e.*, cheaper computation with
 
 * This paper introduces a design for **SimplePIR**, **the fastest single-server PIR scheme known to date**.
 
-* The security holds under a **Learning with Errors scheme** that requires no polynomial arithmetic or fast Fourier transforms. Regev encryption gives a secret-key encryption scheme that is secure under the LWE assumption.
+* The security is held under a **Learning with Errors scheme** that requires no polynomial arithmetic or fast Fourier transforms. Regev encryption gives a secret-key encryption scheme that is secure under the LWE assumption.
 
 * To answer a client’s query, the server performs fewer than **one 32-bit multiplication** and **one 32-bit addition** per **database byte**, achieving **10 GB/s/core server throughput**.
 
-* The first approach to **query a 1 GB database** demands the client to first download a **121 MB "hint" about the database contents**. Then ,the client can make any number of queries, each requiring **242 KB of communication**.
+* The first approach to **querying a 1 GB database** demands the client first to download a **121 MB "hint"** about the database contents**. Then, the client can make any number of queries, each requiring **242 KB of communication**.
 
-* The second approach **shrinks the hint to 16 MB**. Then, following queries demand **345 KB of communication**.
+* The second approach **shrinks the hint to 16 MB**. Then, the following queries demand **345 KB of communication**.
 
 * Finally, the scheme is applied, together with a novel data structure for approximate set membership, to **private auditing in Certificate Transparency**. The results can be compared to Google Chrome’s current approach, with **16 MB of downloads per month, and 150 bytes per TLS connection**.
 
@@ -376,7 +376,7 @@ The original message should be retrieved.
 
 <br>
 
-#### Part IV: Running a Simple Linear Key RRgev Encryption Experiment with a Scaled Message
+#### Part IV: Running a Simple Linear Key Regev Encryption Experiment with a Scaled Message
 
 
 Continuing with Learning with Errors (LWE), we now lose information on the least significant bits by adding noise, *i.e.*, by scaling the message vector (before adding it to encryption) with:
