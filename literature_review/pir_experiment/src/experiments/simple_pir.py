@@ -128,7 +128,7 @@ def secret_key_regev_example() -> None:
     ########################################################################
     # 5. Scale query vector by delta = mod / p and db vector from p to mod
     ########################################################################
-    log_debug('5. We scale the query vector by delta=mod/p and db vecto to 1/p')
+    log_debug('5. We scale the query vector by delta=mod/p and db vector to 1/p')
 
     scaled_query = query.calculate_scaling(regev.mod, regev.p, regev.mod)
     scaled_db = db.calculate_scaling(1, 1, regev.mod)
