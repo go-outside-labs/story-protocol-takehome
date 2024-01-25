@@ -13,7 +13,7 @@
 
 <br>
 
-**[🔗 Review of recent advances on Private Information Retrieval (a type of Homomorphic Encryption) in the context of Story Protocol's privacy-enhanced hooks and modules, while briefly discussing eneral applications of zero-knowledge proof setups](literature_review/).**
+**[🔗 Review of recent advances in Private Information Retrieval (a type of Homomorphic Encryption) in the context of Story Protocol's privacy-enhanced hooks and modules, while briefly discussing applications of zero-knowledge proof setups](literature_review/).**
 
 
 
