@@ -730,7 +730,7 @@ For instance, the popular ZK-SNARK setup could generally be implemented by:
 
 * An off-chain key generator and ceremony, for enough entropy.
 * An on-chain setup to construct and determine the initial state of the prover and verifier (using a combination of public and private keys or a common reference string).
-* At the Function layer, privacy protection hooks could be leveraged to protect IP rights and to allow content encryption, digest registration, private governance, private compliance, private payment, private token gating, duplicated IP detection, and PI protection.
+* At the Function layer, privacy protection hooks could be leveraged to protect IP rights and to allow content encryption, digest registration, private governance, private compliance, private payment, private token gating, duplicated IP detection, and PII protection.
 At the application layer (ecosystem), some examples are KYC verification for license issuers and holders and even a decentralized identity for IP holders.
 
 
