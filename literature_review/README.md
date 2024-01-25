@@ -690,7 +690,7 @@ In this design, PIR could be introduced as follows:
 1. An off-chain preprocessing server as part of the core data.
 2. A new private Module that would be responsible for connecting to this pre-formatted data.
 3. Hooks that would talk to the private Module. For instance, a hook that can submit PIR-formatted encrypted messages from a private oracle search or a private infringement detection request.
-4. Application layers performing queries (client side)
+4. Application layers performing queries (client side).
 
 
 Finally, it's important to note that PIR protocols do not ensure data integrity or authentication. An authenticated PIR scheme could combine an unauthenticated multi-server PIR scheme with a standard integrity-protection mechanism, such as Merkle trees.
@@ -721,7 +721,7 @@ Therefore, we conclude this work by briefly touching on further privacy enhancem
 
 <br>
 
-> 💡 ZKPs come to the forefront as one of three possible solutions to ensure the privacy of the information exchanged on the blockchain. The other ones are secure multi-party computations (sMPC) and trusted execution environments (TEE).
+> 💡 *ZKPs come to the forefront as one of three possible solutions to ensure the privacy of the information exchanged on the blockchain. The other ones are secure multi-party computations (sMPC) and trusted execution environments (TEE).*
 
 
 <br>
