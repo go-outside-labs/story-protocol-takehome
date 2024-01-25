@@ -4,7 +4,7 @@
 
 
 from src.utils.os import load_config
-from src.utils.os import log_info, log_debug, log_error
+from src.utils.os import log_info, log_error
 from src.primitives.message import Message
 
 
