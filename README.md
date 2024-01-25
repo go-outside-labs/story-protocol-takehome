@@ -5,7 +5,7 @@
 <br>
 <br>
 
-### 🟡 Literature Review
+### ✅ Literature Review
 
 <br>
 
@@ -13,7 +13,7 @@
 
 <br>
 
-**[🔗 Review of Private Information Retrieval (also known as Homomorphic Encryption) as a possible Story Protocol's Hook for privacy, security, and compliance](literature_review/).**
+**[🔗 Review of recent advances on Private Information Retrieval (a type of Homomorphic Encryption) in the context of Story Protocol's privacy-enhanced hooks and modules, while briefly discussing eneral applications of zero-knowledge proof setups](literature_review/).**
 
 
 
