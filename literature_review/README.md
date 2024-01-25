@@ -78,7 +78,11 @@ c = m0 ⌖ k0
 
 PIR is also a subset of the broad topic of **lattice-based cryptography**. It refers to a series of **quantum-resistant cryptographic primitives** involving lattices, either in their construction or in the security proof.
 
+<br>
+
 > 💡 *Over an n-dimensional vector space, a lattice is an infinite set of points represented by a collection of vectors.*
+
+<br>
 
 In a [2005 seminal PIR paper](https://dl.acm.org/doi/10.1145/1060590.1060603), Oded Regev introduced the **first lattice-based public-key encryption scheme** and the **learning with errors (LWE) problem**. 
 
@@ -146,18 +150,18 @@ Once PIR becomes less expensive or prohibitive (*i.e.*, cheaper computation with
 
 * To answer a client’s query, the server performs fewer than **one 32-bit multiplication** and **one 32-bit addition** per **database byte**, achieving **10 GB/s/core server throughput**.
 
-* The first approach to **query a 1 GB database** demands the client to first download a **121 MB "hint" about the database contents**. Then the client can make any number of queries, each requiring **242 KB of communication**.
+* The first approach to **query a 1 GB database** demands the client to first download a **121 MB "hint" about the database contents**. Then ,the client can make any number of queries, each requiring **242 KB of communication**.
 
-* The second approach **shrinks the hint to 16 MB**. Then, following queries demands **345 KB of communication**.
+* The second approach **shrinks the hint to 16 MB**. Then, following queries demand **345 KB of communication**.
 
-* Finally, the scheme is applied, together with a novel data structure for approximate set membership, to the task of **private auditing in Certificate Transparency**. The results can be compared to Google Chrome’s current approach, with **16 MB of download per month, along with 150 bytes per TLS connection**.
+* Finally, the scheme is applied, together with a novel data structure for approximate set membership, to **private auditing in Certificate Transparency**. The results can be compared to Google Chrome’s current approach, with **16 MB of downloads per month, and 150 bytes per TLS connection**.
 
 
 <br>
 
 #### A Server and a Query in SimplePIR
 
-To illustrate the results above, I wrote a simple set of experiments in Python. This part is optional for the reader, and the full code is available at [./pir_experiment](pir_experiment).
+🚨 **To illustrate the results above, I wrote a simple set of experiments in Python. This part is optional for the reader, and can be skipped to section III (discussion). The full code is available at [./pir_experiment](pir_experiment).**
 
 
 In this code, the single-server database is represented by a square matrix `(m x m)`, while a query is a vector filled by `0s` except at the asking row and column `(m x 1)`. Any result should have the same dimension as the query vector (*i.e.*, the space is reduced to the size of the column where the data is located).
@@ -182,47 +186,31 @@ A secret key Regev encryption scheme using sampled errors to reproduce LWE is th
 We start by defining a primitive class for the message vector and its operations:
 
 ```python
-import os
-import random
-
 class Message:
 
     def __init__(self, mod=None, rows=None, cols=None, message=None):
-        """Initialize a message vector"""
-
         self.mod = mod
         self.rows = rows
         self.cols = cols
         self.message = message
 
-    ############################
-    #      Private methods 
-    ############################
     def _check_dimensions(self, other_msg) -> None:
-        """Exit if the dimensions of two matrices are different"""
-
         if self.rows != other_msg.rows or self.cols != other_msg.cols:
             os.exit()
 
     def __add__(self, vector):
-        """Add two matrices"""
-
         self._check_dimensions(vector)
         for i in range(len(self.message)):
             self.message[i] = (self.message[i] + vector.message[i]) % self.mod
         return self
 
     def __sub__(self, vector):
-        """Subtract two matrices"""
-
         self._check_dimensions(vector)
         for index in range(len(self.message)):
             self.message[index] = (self.message[index] - vector.message[index]) % self.mod
         return self
 
     def __mul__(self, vector):
-        """Multiply two matrices"""
-
         this_vector = [0] * (self.rows * vector.cols)
         for i in range(self.rows):
             for j in range(self.cols):
@@ -240,30 +228,18 @@ class Message:
     def __repr__(self):
         return f'\nRows: {self.rows}\nCols: {self.cols}\nVector: {self.message}\n'
 
-    ############################
-    #     Public methods 
-    ############################
     def calculate_scaling(self, numerator, denominator, this_mod):
-        """Scale a message vector"""
-
         this_vector = [0] * (self.rows * self.cols)
         for i in range(len(self.message)):
             this_vector[i] = round((numerator * self.message[i]) / denominator) % this_mod
         return Message(this_mod, self.rows, self.cols, this_vector)
 
     def set_query_element(self, row, col, value) -> None:
-        """Set the value at a particular index"""
-
         self.message[row * self.cols + col] = value
         
     def get_query_element(self, row, col) -> int:
-        """Get the value at a particular index"""
-
         return self.message[row * self.cols + col]
 
-    ############################
-    #     Static methods 
-    ############################
     @staticmethod
     def create_random_message(mod, rows, cols): 
         return Message(mod, rows, cols, [random.randint(0, mod - 1) for _ in range(rows * cols)])
@@ -329,12 +305,7 @@ class Regev():
         self.bound = None
         self._load_env_parameters()
 
-    ############################
-    #      Private methods
-    ############################
-    def _load_env_parameters(self) -> None:
-        """Load environment variables"""
-
+    def _load_env_parameters(self);
         env_vars = load_config()
         self.mod = int(env_vars['mod'])
         self.n = int(env_vars['n'])
@@ -342,36 +313,12 @@ class Regev():
         self.p = int(env_vars['p'])
         self.bound = int(env_vars['bound'])
 
-    ############################
-    #      Public methods
-    ############################
-    def print_results(self, m0, m1, m0_string, m1_string) -> None:
-        """Print the results of the experiment"""
-
-        if m0 == m1:
-            log_info(f'Original msg was successfully retrieved!\n')
-        else:
-            log_error(f'Original msg was not retrieved.')
-        log_info(f'{m0_string}: {m0}\n')
-        log_info(f'{m1_string}: {m1}\n')
-        log_info(f'Parameters: \nmod: {self.mod} \nn: {self.n} \nm: {self.m} \np: {self.p} \nbound: [-{self.bound}, {self.bound}] \n')
-
-    def print_noise_growth(self, m0, m1, noise_growth) -> None:
-        """Print the noise growth"""
-
-        log_info(f'Correct decryption for Delta / 2: {(self.mod / self.p) / 2}? {m0 == m1}')
-        log_info(f'Noise growth: {noise_growth.message[0]}')
-
     def create_secret_key(self, this_mod=None, msg_n=1):
-        """Create a secret key vector"""
-
         if this_mod is None:
             this_mod = self.mod
         return  Message.create_random_message(this_mod, self.n, msg_n)
 
     def create_message_setup(self, this_m=None, this_n=None, this_mod=None, msg_n=None):
-        """Create a message vector setup"""
-        
         if this_mod is None:
             this_mod = self.mod
         if this_m is None:
@@ -381,13 +328,8 @@ class Regev():
         if msg_n is None:
             msg_n = 1
 
-        # message vector of size `m`, where each element has a modulus `mod`
-        m0= Message.create_random_message(this_mod, self.m, msg_n)
-
-        # public    
+        m0 = Message.create_random_message(this_mod, self.m, msg_n)
         A = Message.create_random_message(self.mod, self.m, self.n)
-
-        # error vector
         e = Message.calculate_sample_error(self.bound, self.mod, self.m, msg_n)
 
         return m0, A, e
@@ -399,7 +341,7 @@ class Regev():
 
 #### Part III: Encryption and Decryption of a Message with a Sampled Error Vector
 
-To illustrate how LWE can work, we operate our message vector over a ring modulo `mod`, so some information is lost. Then use Gaussian Elimination (a method to solve linear equations) to recover the original message.
+To illustrate how LWE can work, we operate our message vector over a ring modulo `mod`, so some information is lost. Then, use Gaussian Elimination (a method to solve linear equations) to recover the original message.
 
 First, we represent a message vector `m0` of size `m`, where each element has a modulo `mod`. 
 
@@ -412,41 +354,19 @@ Then, we set the ciphertext as the tuple `c = (B, A)` and decrypt `c = (B, A)` f
 
 ```python
 def linear_secret_key_regev_encryption_with_error():
-    """ 
-        This method runs a secret key Regev encryption and decryption 
-        experiment for a msg vector with a sampled error vector.
 
-        In this simple example of learning with error (LWE), we operate
-        our message vector over a ring modulo mod, such that some
-        information is lost. This is not a problem since Gaussian elimination
-        can be used to recover the original message vector (i.e., it works
-        over a ring modulo mod).
-
-        We represent the message vector m0 of size m where each element is
-        modulus mod. The cipertext c is B = A * s + e + m0, which can be
-        decrypted as c = (B, A).
-    """
-
-    ########################################################################
     # 1. Key generation
-    ########################################################################
     regev = Regev()
     m0, A, e = regev.create_message_setup()
     s = regev.create_secret_key()
 
-    ########################################################################
     # 2. Encryption by calculating B and ciphertext c
-    ########################################################################
     c = regev.calculate_encryption(A, s, e, m0)
 
-    ########################################################################
     # 3. Calculate the decryption of the ciphertext c
-    ########################################################################
     m1 = regev.calculate_decryption(s, c)
 
-    ########################################################################
     # 4. The message vector m1 should be equal to m0 plus the error vector e
-    ########################################################################
     regev.print_results(m0, m0 + e, 'm0', 'm0 + e')
 ```
 
@@ -495,54 +415,25 @@ This is the code:
 
 ```python
 def linear_secret_key_regev_encryption_scaled():
-    """ 
-        This method runs a secret key Regev encryption and decryption experiment
-        for a msg vector with a scaled msg vector.
 
-        In this another simple example of learning with errors (LWE), we lose
-        information on the least significant bits by adding noise, i.e., by scaling 
-        the message vector by delta = mod / p before adding it to encryption. 
-        Then, during the decryption, we scale the message vector by 1 / delta.
-
-        The scaling ensures that m is in the highest bits of the message vector,
-        without losing information with the addition of the error vector e.
-
-        Now, the message m0 vector has each element module p (not mod), where
-        p < q. The scaled message is now m0_scaled = m0 * delta = m0 * mod / p.
-        The cipertext c is B = A * s + e + m0_scaled, which can be decrypted as
-        c = (B, A), i.e., m0 = (B - A * s) / delta = (delta * m0 + e) / delta.
-    """
-
-    ########################################################################
     # 1. Key generation
-    ########################################################################
     regev = Regev()
     m0, A, e = regev.create_message_setup(this_mod = regev.p)
     s = regev.create_secret_key()
 
-    ########################################################################
     # 2. Scale message vector by delta = mod / p
-    ########################################################################
     scaled_m0 = m0.calculate_scaling(regev.mod, regev.p, regev.mod)
 
-    ########################################################################
     # 3. Encryption by calculating B and ciphertext c
-    ########################################################################
     c = regev.calculate_encryption(A, s, e, scaled_m0)
 
-    ########################################################################
     # 4. Calculate the decryption of the ciphertext c
-    ########################################################################
     m1 = regev.calculate_decryption(s, c)
 
-    ########################################################################
     # 5. Scale m1 vector by 1/ delta = p / mod
-    ########################################################################
     scaled_m1 = m1.calculate_scaling(regev.p, regev.mod, regev.p)
 
-    ########################################################################
     # 6. The message vector m0 should be equal to m1
-    ########################################################################
     regev.print_results(m0, scaled_m1, 'm0', 'scaled m1')
 ```
 
@@ -569,54 +460,33 @@ Here is the source code for this experiment:
 
 ```python
 def additive_homomorphism() -> None:
-    """ 
-        This method proves that the secret key Regev encryption scheme is
-        additive homomorphic, i.e., if c0 encrypts m0 and c1 encrypts m1,
-        both under s, then c0 + c1 decrypts to m0 + m1. 
-    """
 
-    ########################################################################
     # 1. Key generation for two independent messages m0 and m1
-    ########################################################################
     r0 = Regev()
     m0, A0, e0 = r0.create_message_setup(this_mod = r0.p)
-
     r1 = Regev()
     m1, A1, e1 = r1.create_message_setup(this_mod = r1.p)
-
     s = r0.create_secret_key()
 
-    ########################################################################
     # 3. Scale message vectors by delta = mod / p
-    ########################################################################
     scaled_m0 = m0.calculate_scaling(r0.mod, r0.p, r0.mod)
     scaled_m1 = m1.calculate_scaling(r1.mod, r1.p, r1.mod)
 
-    ########################################################################
     # 4. Encryption by calculating B and ciphertext c for each message
-    ########################################################################
     c0 = r0.calculate_encryption(A0, s, e0, scaled_m0)
     c1 = r1.calculate_encryption(A1, s, e1, scaled_m1)
 
-    ########################################################################
     # 5. Add the ciphertexts, with c2 = c0 + c1
-    ########################################################################
     c2 = (c0[0] + c1[0], c0[1] + c1[1])
 
-    ########################################################################
     # 6. Decrypt the sum of the ciphertexts
-    ########################################################################
     r2 = Regev()
     m2 = r2.calculate_decryption(s, c2)
 
-    ########################################################################
     # 5. Scale m1 vector by 1/ delta = p / mod
-    ########################################################################
     scaled_m2 = m2.calculate_scaling(r2.p, r2.mod, r2.p)
 
-    ########################################################################
     # 6. The sum of the message vectors m0 and m1 should be equal to m2
-    ########################################################################
     r2.print_results(m0 + m1, scaled_m2, 'm0 + m1', 'm2')
 ```
 
@@ -645,70 +515,42 @@ Here is the source code:
 
 
 def plaintext_inner_product():
-    """ 
-        This method proves that the secret key regev encryption scheme is
-        supports plaintext inner product, i.e., if c0 encrypts m0 and c1
-        encrypts m1, both under s, then c0 * c1 decrypts to m0 * m1.
-    """
 
-    ########################################################################
     # 1. Key generation
-    ########################################################################
     r0 = Regev()
     m0, A, e = r0.create_message_setup(this_mod = r0.p)
     s = r0.create_secret_key(this_mod = r0.p)
 
-    ########################################################################
     # 2. Scale message vector by delta = mod / p
-    ########################################################################
     scaled_m0 = m0.calculate_scaling(r0.mod, r0.p, r0.mod)
 
-    ########################################################################
     # 3. Encryption by calculating B and ciphertext c
-    ########################################################################
     c = r0.calculate_encryption(A, s, e, scaled_m0)
 
-    ########################################################################
-    # 4. Calculate a plaintext vector transposed k and then scale it by
-    #    delta = mod / p
-    ########################################################################
+    # 4. Calculate a plaintext vector transposed k and then scale it by delta = mod / p
     rk = Regev()
     k = m0.create_random_message(rk.p, 1, rk.m )
     scaled_k = m0.calculate_scaling(1, 1, rk.mod)
 
-    ########################################################################
     # 5. Calculate the noise growth 
-    ########################################################################
     noise_growth = scaled_k * e
 
-    ########################################################################
     # 6. Define the ciphertext of the inner product of m0 and k
-    ########################################################################
     c1 = (scaled_k * c[0], scaled_k * c[1])
 
-    ########################################################################
     # 7. Decrypt the ciphertext of the inner product of m0 and k
-    ########################################################################
     m1 = r0.calculate_decryption(s, c1)
 
-    ########################################################################
     # 8. Scale m1 vector by 1/ delta = p / mod
-    ########################################################################
     m1_scaled = m1.calculate_scaling(r0.p, r0.mod, r0.p)
 
-    ########################################################################
     # 9. Scale back the plaintext vector k by 1/ delta = p / mod
-    ########################################################################
     scaled_scaled_k = scaled_k.calculate_scaling(1, 1, rk.p)
 
-    ########################################################################
     # 10. The message vector m1 scaled should be equal scaled k * m0
-    ########################################################################
     r0.print_results(m1_scaled, scaled_scaled_k * m0, 'scaled m1', 'scaled k * m0')
 
-    ########################################################################
     # 11. Print results on noise, decryption fails when noise > delta / 2 
-    ########################################################################
     rk.print_noise_growth(m1_scaled, scaled_scaled_k * m0, noise_growth)
 ```
 
@@ -732,70 +574,26 @@ We then show that computing the dot product of the database vector to the query 
 
 ```python
 def no_encryption_example():
-    """
-        Run a tutorial presenting the logic of a PIR experiment 
-        without encryption.
-    """
 
-    ########################################################################
-    # 1. Represent a database as a square matrix, where the columns are 
-    #    the database entries and the rows are the database attributes
-    ########################################################################
-    log_debug('In this PIR tutorial, we represent a database as a square matrix, ' + 
-        'where columns are the database entries and rows are the database attributes.')
-    
-    log_debug('We intantiate the class Message(), creating a random database ' +
-                                  'with mod 500, and 20 entries and 20 attributes.\n')
-
+    # 1. Represent a database as a square matrix
     msg = Message()
     db = msg.create_random_message(500, 20, 20)
-    
-    log_debug(f'db: {db}\n')
-
-    ########################################################################
+  
     # 2. Create some random query value for row and column
-    ########################################################################
-    log_debug('Now, let\'s create a random query value for row and column. ' +
-                                            'Say, row 10 and column 10.')
-    
     query_row = 10
     query_col = 10
 
-    log_debug(f'query_row: {query_row}, query_col: {query_col}\n')
-
-    ########################################################################
     # 3. Create a message that is 5 at the query column and 0 elsewhere
-    ########################################################################
-    log_debug('Let\'s create a query message vector, of size 500, that is 1 at ' +
-                                            'the query column and 0 elsewhere.')
     query = msg.create_zero_message(500, 20, 1)
     query.set_query_element(query_col, 0, 1)
 
-    log_debug(f'query vector: {query.message}')
-
-    ########################################################################
-    # 4. Compute resulting message vector
-    ########################################################################
-    log_debug('Let\'s compute the resulting message vector, which is the ' +
-                               'dot product of the database and the query.')
-    
+    # 4. Compute resulting message vector    
     result = db * query
     log_debug(f'result = db * query: {result}\n')
 
-    ########################################################################
     # 5. Compute msg retrieved from the database
-    ########################################################################
-    log_debug('Finally, let\'s compute the message retrieved from the database, ' + 
-                    'by getting the element at the query row and column.')
-    log_debug(f'db.get_query_element({query_row}, {query_col}): {db.get_query_element(query_row, query_col)}\n')
-
-    log_debug('This should be the same as the result message vector element at the query row.')
-    log_debug(f'result.get_query_element({query_row}, 0): {result.get_query_element(query_row, 0)}\n')
-
     correct_retrieval = result.get_query_element(query_row, 0) == \
                         db.get_query_element(query_row, query_col)
-
-    log_info(f'Are they the same? Did we get a correct retrieval? {correct_retrieval}')
 ```
 
 <br>
@@ -811,112 +609,46 @@ Finally, we achieve a full PIR experiment by building a query vector as in the p
 ```python
 def secret_key_regev_example():
 
-    """Run a secret key regev encryption and decryption PIR experiment."""
-    ########################################################################
-    # 1. Represent a database as a square matrix, where the columns are 
-    #    the database entries and the rows are the database attributes
-    ########################################################################
+    # 1. Represent a database as a square matrix
     regev = Regev()
-    msg = Message()
-
-    log_debug('1. We start creating a random message vector ' + 
-                                 'as a square m x m database with mod p')
-    
+    msg = Message()    
     db = msg.create_random_message(regev.p, regev.m, regev.m)
-    log_debug(f'db: {db}\n')
 
-    ########################################################################
     # 2. Create some random query value for row and column
-    ########################################################################
     log_debug('2. Now, let\'s create a random query value for row and column.')
     query_row = 5
     query_col = 5
 
-    log_debug(f'query_row: {query_row}, query_col: {query_col}\n')
-
-    ########################################################################
-    # 3. Create query message vector
-    ########################################################################
-    log_debug('3. Let\'s create a query message vector, of size m, that is 1 at ' +
-                                            'the query column and 0 elsewhere.')                
-
+    # 3. Create query message vector            
     query = msg.create_zero_message(regev.mod, regev.m, 1)
     query.set_query_element(query_col, 0, 1)
 
-    log_debug(f'query vector: {query.message}\n')
-
-    ########################################################################
     # 4. Encrypt query message vector
-    ########################################################################
-    log_debug('4. Let\'s encrypt the query message vector, calculating A and e.')
-   
     _, A, e = regev.create_message_setup()
-
     # Here we could either use mod or p as the scaling factor.
     s = regev.create_secret_key()
 
-    log_debug(f'The secret key s: {s}')
-
-    ########################################################################
     # 5. Scale query vector by delta = mod / p and db vector from p to mod
-    ########################################################################
-    log_debug('5. We scale the query vector by delta=mod/p and db vector to 1/p')
-
     scaled_query = query.calculate_scaling(regev.mod, regev.p, regev.mod)
     scaled_db = db.calculate_scaling(1, 1, regev.mod)
 
-    log_debug(f'scaled_query: {scaled_query}')
-    log_debug(f'scaled_db: {scaled_db}\n')
-
-    ########################################################################
     # 6. Encryption by calculating B and ciphertext c
-    ########################################################################
-    log_debug('6. Let\'s encrypt the query vector by calculating B and ciphertext c.')
     c_query = regev.calculate_encryption(A, s, e, scaled_query)
 
-    log_debug(f'c_query: {c_query}\n')
-
-    ########################################################################
     # 7. Compute encrypted result
-    ########################################################################
-    log_debug('7. Let\'s compute the encrypted result by calculating the dot ' +
-                 'product of the encrypted query and the encrypted database.') 
-
     c_result = (scaled_db * c_query[0], scaled_db * c_query[1])
 
-    log_debug(f'c_result: {c_result}\n')
-
-    ########################################################################
     # 8. Calculate the decryption of the ciphertext c_result to find the
-    #    result of the PIR query at the query_col th column
-    ########################################################################
-    log_debug('8. Let\'s calculate the decryption of the ciphertext c_result')                 
+    #    result of the PIR query at the query_col th column             
     m1 = regev.calculate_decryption(s, c_result)
 
-    log_debug(f'm1: {m1}\n') 
-
-    ########################################################################
     # 9. Scale the result by p / mod
-    ########################################################################
-    log_debug('9. Let\'s scale the result by p / mod.')
     m1_scaled = m1.calculate_scaling(regev.p, regev.mod, regev.p)
-
-    log_debug(f'm1_scaled: {m1_scaled}\n')
-
-    ########################################################################    
+  
     # 10. The message vector m1_scaled should be equal to the db at the 
-    # query vector query_row, query_col, showing that PIR works.
-    ########################################################################
-    log_debug('10. The message vector m1_scaled should be equal to the db at ' +
-               'the query vector query_row, query_col, showing that PIR works.')  
-
-    log_debug(f'db.get_query_element({query_row}, {query_col}): {db.get_query_element(query_row, query_col)}') 
-    log_debug(f'm1_scaled.get_query_element({query_row}, 0): {m1_scaled.get_query_element(query_row, 0)}\n')            
-
+    # query vector query_row, query_col, showing that PIR works.        
     correct_retrieval = m1_scaled.get_query_element(query_row, 0) == \
                         scaled_db.get_query_element(query_row, query_col)
-
-    log_info(f'Are they the same? Did we get a correct retrieval? {correct_retrieval}\n')
 ```
 
 
@@ -929,16 +661,16 @@ The original message should be retrieved.
 
 ---
 
-### IV. Discussion
+### III. Discussion
 
 <br>
 
 #### Why PIR is Still Not Feasible
 
 
-Although modern PIR schemes require surprisingly little communication and the protocol works well enough at smaller scales, the time needed to scan it grows proportionally as the database grows. For bigger databases, the process becomes prohibitively inefficient (fetching a database record grows only polylogarithmically with the number of records,`N`).
+Although modern PIR schemes require surprisingly little communication and the protocol works well enough at smaller scales, the time needed to scan it grows proportionally as the database grows. For bigger databases, the process becomes prohibitively inefficient (fetching a database record grows only polylogarithmically with the number of records, `N`).
 
-After preprocessing the database, the server can answer a query in time sublinear in N. Thus, the current hard limit on the throughput of PIR schemes is the ratio between the database size and the server time to answer a query (the speed with which the PIR server can read the database from memory).
+After preprocessing the database, the server can answer a query in time sublinear in `N`. Thus, the current hard limit on the throughput of PIR schemes is the ratio between the database size and the server time to answer a query (the speed with which the PIR server can read the database from memory).
 
 
 <br>
@@ -950,12 +682,12 @@ If PIR protocols become fully available for commercial applications, Story Proto
 Although it's still early to define how this protocol could be incorporated into Story's modular architecture, we discuss an idea here.
 
 [Story Protocol's documentation](https://docs.storyprotocol.xyz/docs/) defines the **Function Layer (verbs)** separated from the **Data Layer (nouns)** and divided into two types of components:
-- **Modules**, defining the actions that users can perform on the IP assets (IPAs), *i.e,.* the management of the data. 
+- **Modules**, defining the actions that users can perform on the IP assets (IPAs), *i.e.,* the management of the data. 
 - **Hooks**, defining the add-on features based on the actions provided by modules. 
 
-In this design, PIR could be introduced as follow:
+In this design, PIR could be introduced as follows:
 
-1. An off-chain pre-processing server as part of the core data.
+1. An off-chain preprocessing server as part of the core data.
 2. A new private Module that would be responsible for connecting to this pre-formatted data.
 3. Hooks that would talk to the private Module. For instance, a hook that can submit PIR-formatted encrypted messages from a private oracle search or a private infringement detection request.
 4. Application layers performing queries (client side)
@@ -963,7 +695,8 @@ In this design, PIR could be introduced as follow:
 
 Finally, it's important to note that PIR protocols do not ensure data integrity or authentication. An authenticated PIR scheme could combine an unauthenticated multi-server PIR scheme with a standard integrity-protection mechanism, such as Merkle trees.
 
-In this approach, PIR servers download the data from the blockchain to construct PIR databases. For each database, the PIR server create a description file (usually called a *manifest file*). The user collect all available block headers and fetches the manifest files from the PIR servers to later efficiently query the PIR database.
+In this approach, PIR servers download the data from the blockchain to construct PIR databases. For each database, the PIR server creates a description file (usually called a *manifest file*). The user collects all available block headers and fetches the manifest files from the PIR servers to query the PIR database later efficiently.
+
 
 <br>
 
@@ -977,13 +710,13 @@ In this approach, PIR servers download the data from the blockchain to construct
 
 #### Zero Knowledge Proofs for Other Privacy-Enhanced Operations
 
-In the Story Protocol documentation, there is a hint at the applicability of ZKPs and cryptographic setups when [speaking of AI-generated Assets marketplaces](https://docs.storyprotocol.xyz/docs/ai-generated-assets-marketplace).
+In the Story Protocol documentation, there is a hint at the applicability of ZKPs and cryptographic setups when [speaking of AI-generated Assets marketplaces](https://docs.storyprotocol.xyz/docs/ai-generated-assets-marketplace):
 
 > *"Use ZKP or simple hash of prompt to validate that the marketplace is running infringement checks without revealing prompts".*
 
 <br>
 
-Therefore, we conclude this work by briefly touching further privacy enhancements through a zero-knowledge protocol, which is designed to verify the truth of information without revealing the information itself. In other words, a verifier can convince themselves that a prover possesses knowledge of a secret parameter (called a witness) satisfying some relation, without revealing the witness to the verifier or anyone else.
+Therefore, we conclude this work by briefly touching on further privacy enhancements through a zero-knowledge protocol, which is designed to verify the truth of information without revealing the information itself. In other words, a verifier can convince themselves that a prover possesses knowledge of a secret parameter (called a witness) satisfying some relation, without revealing the witness to the verifier or anyone else.
 
 
 <br>
@@ -1003,9 +736,9 @@ At the application layer (ecosystem), some examples are KYC verification for lic
 
 <br>
 
-Current downsides of this technology are:
+The current downsides of this technology are:
 
-* Computation intensity: algorithms used are computationally intense as they require many interactions between the verifier and the prover (in interactive ZKPs), or require a lot of computational capabilities (in non-interactive ZKPs).
+* Computation intensity: algorithms used are computationally intense as they require many interactions between the verifier and the prover (in interactive ZKPs), or a lot of computational capabilities (in non-interactive ZKPs).
 
 * Design ZkEVM challenge: zkEVM that is fully compatible with native EVM is difficult to build.
 
