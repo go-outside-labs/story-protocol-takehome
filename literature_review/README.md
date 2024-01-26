@@ -115,7 +115,7 @@ Therefore, a simple server PIR scheme would comprise two phases:
 
 * **the online phase**, with the query processing on the server and response decoding on the client.
 
-The practicality of PIR-based applications is primarily impacted by the query processing time and the hint exchange phase. The theoretical query size grows as the square root of the number of field elements representing the database. For example, the largest query size for a database of `32 GB` is around `600 KB`.
+The practicality of PIR-based applications is primarily impacted by the query processing time and the hint exchange phase. The theoretical query size can be estimated as growing as the square root of the number of elements "represented" in the database. 
 
 
 <br>
