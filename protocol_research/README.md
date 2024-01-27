@@ -16,7 +16,7 @@ Following [Story's design principles](https://docsend.com/view/g5wcqbm9a3se446t)
 <br>
 <br>
 
-Our protocol is designed to take advantage of non-fungible tokens (*i.e.*, EVM’s compatible standards such as [ERC-721](https://ethereum.org/en/developers/docs/standards/tokens/erc-721), [ERC-1155](https://ethereum.org/en/developers/docs/standards/tokens/erc-1155), and extensions) for game assets, which includes **ownership** (the address that holds the token or the), provable [scarcity](https://vitalik.eth.limo/general/2021/03/23/legitimacy.html) (through rarity traits and authenticity), [interoperability](https://www.playtoearn.online/whats-interoperability/), and **emitting events** when the state changes.
+Our protocol is designed to take advantage of non-fungible tokens (*i.e.*, EVM’s compatible standards such as [ERC-721](https://ethereum.org/en/developers/docs/standards/tokens/erc-721), [ERC-1155](https://ethereum.org/en/developers/docs/standards/tokens/erc-1155), and extensions) for game assets, which includes **ownership** (the address that holds the token), provable [scarcity](https://vitalik.eth.limo/general/2021/03/23/legitimacy.html) (through rarity traits and authenticity), [interoperability](https://www.playtoearn.online/whats-interoperability/), and **emitting events** when the state changes.
 
 Storage and computation costs are expensive and restricted on the Ethereum blockchain. To overcome the challenges regarding **searching, sorting, notification**, and **bartering**, our **hybrid design contains both on-chain and off-chain components**. 
  
