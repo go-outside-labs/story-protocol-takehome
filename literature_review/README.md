@@ -62,7 +62,7 @@ c = m0 ⌖ k0
 
 **Homomorphism** is the property that if a client sends two encrypted messages, `c1` and `c2` (from messages `m0` and `m1`, respectively), the server can return `c1 ⌖ c2` so the client can retrieve `m0 ⌖ m1`.
 
-**Additive homomorphism** occurs when, given two ciphertexts `(a0, c0)` and `(a1, c1)`, their sum `(a0 + a1, c0 + c1)` decrypts to the sum of the plaintexts (provided that the error remains sufficiently small).
+**Additive homomorphism** occurs when, given two ciphertexts `(a0, c0)` and `(a1, c1)`, their sum `(a0 + a1, c0 + c1)` decrypts to the sum of the plaintexts (provided that the error remains sufficiently small). In general, performing additions on encrypted ciphertexts is easy, but multiplications are incredibly hard.
 
 **Partially homomorphic encryption** can be easily achieved as it accepts the possibility that not all data is encrypted (or homomorphic) through other operations (such as multiplication). 
 
