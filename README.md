@@ -53,3 +53,21 @@
 
 
 <br>
+
+----
+
+<br>
+
+### ✅ Tech Interview with Partners
+
+<br>
+
+> *Objective: Understand Story Protocol in the context of the Blockchain Technical Ecosystem.*
+
+<br>
+
+**[🔗 Research the integration of Story Protocol's Data Layer to Celestia's modular data availability network](celestia/)**.
+
+
+<br>
+

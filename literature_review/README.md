@@ -138,7 +138,7 @@ Once PIR becomes less expensive or prohibitive (*i.e.*, cheaper computation with
 
 ---
 
-### II. ["Simple and Fast Single-Server Private Information Retrieval", by Alexandra Henzinger et. al (2022)](https://eprint.iacr.org/2022/949) 
+### II. ["Simple and Fast Single-Server Private Information Retrieval", by Alexandra Henzinger et al. (2022)](https://eprint.iacr.org/2022/949) 
 
 <br>
 
