@@ -130,6 +130,8 @@ Once PIR becomes less expensive or prohibitive (*i.e.*, cheaper computation with
 
 - **Safe browsing and private oracles, checking passwords over breached databases (or any type of credentials), Certificate Transparency (CT) checks, certificate revocation checks,** among many others.
 
+- **Privacy-preserving blockchain light clients**: the light client ask for an encrypted index `i` for the `ith` piece of data in a block, and the full node computes and returns `data[0]_i + data[1]_i + ... + data[n]_i` for `i = k`, where `data[i]` is the data in a block plus its Merkle branch. The server learns nothing about what the light client asked.
+
 
 
 
