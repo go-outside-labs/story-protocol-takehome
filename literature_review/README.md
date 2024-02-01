@@ -168,6 +168,10 @@ Once PIR becomes less expensive or prohibitive (*i.e.*, cheaper computation with
 
 In this code, the single-server database is represented by a square matrix `(m x m)`, while a query is a vector filled by `0s` except at the asking row and column `(m x 1)`. Any result should have the same dimension as the query vector (*i.e.*, the space is reduced to the size of the column where the data is located).
 
+> *"Given `m` samples `(b0, a0) ∈ ℤqx ℤnq`, `(b1, a1), ..., (b_m-1, a_m-1)` such that `bi = <ai, s> + ei`, where `s ∈ ℤnq` and `ei` is sampled randomly from range `[-B,..,+B]` and `B` is small, finding `s` is hard.*
+
+
+
 The server retrieves the queried item by:
 
 1. looping over every column and multiplying their values to the value in the same row of the query vector, and
