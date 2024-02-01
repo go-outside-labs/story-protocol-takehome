@@ -66,7 +66,7 @@ c = m0 ⌖ k0
 
 **Partially homomorphic encryption** can be easily achieved as it accepts the possibility that not all data is encrypted (or homomorphic) through other operations (such as multiplication). 
 
-**Fully homomorphic encryption (FWE)**, which is much harder to achieve, would occur if a server operated on encrypted data **without seeing ANY of its content.**
+**Fully homomorphic encryption (FWE)**, which is much harder to achieve, would occur if a server operated on encrypted data **without seeing ANY of its content. In the [words of Vitalik](https://vitalik.eth.limo/general/2020/07/20/homomorphic.html), *"it is a type of encryption that allows a third party to perform computations on encrypted data, and get an encrypted result that they can hand back to whoever has the decryption key for the original data, without the third party being able to decrypt the data or the result themselves."***
 
 <br>
 
