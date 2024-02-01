@@ -170,6 +170,14 @@ In this code, the single-server database is represented by a square matrix `(m x
 
 > *"Given `m` samples `(b0, a0) ∈ ℤqx ℤnq`, `(b1, a1), ..., (b_m-1, a_m-1)` such that `bi = <ai, s> + ei`, where `s ∈ ℤnq` and `ei` is sampled randomly from range `[-B,..,+B]` and `B` is small, finding `s` is hard.*
 
+<br>
+
+<p align="center">
+<img src="https://github.com/bt3gl/STORY-PROTOCOL-TAKEHOME/assets/1130416/2416c860-2088-4063-8d17-118ef8c30360" width="60%" align="center"/>
+<br>
+<br>
+
+
 
 
 The server retrieves the queried item by:
