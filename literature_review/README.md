@@ -173,7 +173,7 @@ In this code, the single-server database is represented by a square matrix `(m x
 <br>
 
 <p align="center">
-<img src="https://github.com/bt3gl/STORY-PROTOCOL-TAKEHOME/assets/1130416/2416c860-2088-4063-8d17-118ef8c30360" width="60%" align="center"/>
+<img src="https://github.com/mia-stein/STORY-PROTOCOL-TAKEHOME/assets/1130416/2416c860-2088-4063-8d17-118ef8c30360" width="60%" align="center"/>
 <br>
 <br>
 

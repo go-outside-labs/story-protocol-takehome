@@ -1,5 +1,5 @@
 ## [Application](https://storyprotocol.notion.site/Blockchain-researcher-take-home-exercise-2c5a1eeea359414a9cbdad506fa86121) for [Researcher && Engineer](https://jobs.lever.co/storyprotocol/39ca4806-d5d9-44aa-9b17-0958b9a8d5fd), Story Protocol
-### by [bt3gl](https://github.com/bt3gl)
+### by [mia-stein](https://github.com/mia-stein)
 
 
 <br>

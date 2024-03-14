@@ -7,7 +7,7 @@ setup(
                     'src.experiments', \
                     'src.primitives', \
                     'src.utils']),
-    author="bt3gl",
+    author="mia-stein",
     install_requires=['python-dotenv'],
     entry_points={
         'console_scripts': ['pir=src.main:run']
